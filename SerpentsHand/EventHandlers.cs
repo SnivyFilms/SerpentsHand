@@ -81,6 +81,7 @@ namespace SerpentsHand
 				if (!scpAlive && !Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps)
 					return;
 				
+				ev.IsAllowed = false;
 				List<Player> players = ev.Players.GetRange(0, ev.Players.Count > Plugin.Instance.Config.SpawnManager.MaxSquad 
 					? Plugin.Instance.Config.SpawnManager.MaxSquad 
 					: ev.Players.Count);
