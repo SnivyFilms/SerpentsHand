@@ -24,6 +24,10 @@ namespace SerpentsHand.Roles
         public override string Description { get; set; } = "Help the SCPs by killing all other classes";
         public override string CustomInfo { get; set; } = "Serpents Hand Enchanter";
         public override bool IgnoreSpawnSystem { get; set; } = true;
+        public bool ShowFriendlyFireMessage { get; set; } = true;
+        public string PreventFriendlyFireMessageOnScps { get; set; } = "SCPs are on your side!";
+        public string PreventFriendlyFireMessageOnSh { get; set; } = "Serpents Hand are on your side!";
+        public float PreventFriendlyFireMessageDuration { get; set; } = 5f;
 
         public override List<string> Inventory { get; set; } = new()
        {
@@ -54,23 +58,20 @@ namespace SerpentsHand.Roles
 
         protected override void SubscribeEvents()
         {
-            Timing.CallDelayed(1f, () =>
-            {
-                PlayerEvent.EnteringPocketDimension += OnEnteringPocketDimension;
-                PlayerEvent.Hurting += OnHurting;
-                PlayerEvent.Shot += OnShot;
-                PlayerEvent.ActivatingGenerator += OnActivatingGenerator;
-                PlayerEvent.ChangingRole += OnChangingRole;
+            PlayerEvent.EnteringPocketDimension += OnEnteringPocketDimension;
+            PlayerEvent.Hurting += OnHurting;
+            //PlayerEvent.Shot += OnShot;
+            PlayerEvent.ActivatingGenerator += OnActivatingGenerator;
+            PlayerEvent.ChangingRole += OnChangingRole;
 
-                base.SubscribeEvents();
-            });
+            base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
             PlayerEvent.EnteringPocketDimension -= OnEnteringPocketDimension;
             PlayerEvent.Hurting -= OnHurting;
-            PlayerEvent.Shot -= OnShot;
+            //PlayerEvent.Shot -= OnShot;
             PlayerEvent.ActivatingGenerator -= OnActivatingGenerator;
             PlayerEvent.ChangingRole -= OnChangingRole;
 
@@ -85,25 +86,28 @@ namespace SerpentsHand.Roles
 
         private void OnHurting(HurtingEventArgs ev)
         {
-            if (ev.Attacker is null) 
+            if (ev.Attacker == null) 
                 return;
-            //if ((Check(ev.Player) || Check(ev.Attacker)) && (ev.Player.IsScp || ev.Attacker.IsScp))
-            //    ev.IsAllowed = false;
-            if (Check(ev.Player) && ev.Attacker.IsScp || (Check(ev.Attacker) && ev.Player.IsScp))
+            if (Check(ev.Player) && ev.Attacker.IsScp)
+            {
                 ev.IsAllowed = false;
+                if (ShowFriendlyFireMessage)
+                    ev.Player.ShowHint(PreventFriendlyFireMessageOnSh, PreventFriendlyFireMessageDuration);
+            }
+            else if (Check(ev.Attacker) && ev.Player.IsScp)
+            {
+                ev.IsAllowed = false;
+                if (ShowFriendlyFireMessage)
+                    ev.Player.ShowHint(PreventFriendlyFireMessageOnScps, PreventFriendlyFireMessageDuration);
+            }
         }
 
-        private void OnShot(ShotEventArgs ev)
+        /*private void OnShot(ShotEventArgs ev)
         {
             //if (Check(ev.Player) && ev.Target != null && ev.Target.IsScp)
-            if (Check(ev.Player) && ev.Target != null && (ev.Target.Role == RoleTypeId.Scp049 || 
-                                                          ev.Target.Role == RoleTypeId.Scp096 || 
-                                                          ev.Target.Role == RoleTypeId.Scp106 || 
-                                                          ev.Target.Role == RoleTypeId.Scp173 || 
-                                                          ev.Target.Role == RoleTypeId.Scp0492 || 
-                                                          ev.Target.Role == RoleTypeId.Scp939))
+            if (Check(ev.Player) && ev.Target.IsScp)
                 ev.CanHurt = false;
-        }
+        }*/
 
         private void OnActivatingGenerator(ActivatingGeneratorEventArgs ev)
         {
