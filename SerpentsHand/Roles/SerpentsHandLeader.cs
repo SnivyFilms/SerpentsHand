@@ -47,7 +47,7 @@ namespace SerpentsHand.Roles
              new()
              {
                 Name = "Spawn Point",
-                Position = new UnityEngine.Vector3(63f, 992f, -50f),
+                Position = new UnityEngine.Vector3(63f, 292f, -50f),
                 Chance = 100
              }
           }
