@@ -21,7 +21,7 @@ namespace SerpentsHand.Configs
         public bool CanSpawnWithoutScps { get; set; } = false;
 
         [Description("Set this to false if Chaos and SCPs CANNOT win together on your server")]
-        public bool ScpsWinWithChaos { get; set; } = true;
+        public bool ScpsWinWithChaos { get; set; } = false;
 
         [Description("The message annouced by CASSIE when Serpents hand spawn. (Empty = Disabled)")]
         public string EntryAnnoucement { get; set; } = "SERPENTS HAND HASENTERED";
