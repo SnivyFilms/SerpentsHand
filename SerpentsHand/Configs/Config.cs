@@ -16,10 +16,10 @@ namespace SerpentsHand.Configs
 
         [Description("How many seconds before a spawnwave occurs should it calculate the spawn chance. This value **MUST** be lower than 13")]
         public int SpawnWaveCalculation { get; set; } = 10;
-
-        public Roles.SerpentsHand SerpentsHand { get; set; } = new();
+        
         public Roles.SerpentsHandLeader SerpentsHandLeader { get; set;} = new();
         public Roles.SerpentsHandSpecialist SerpentsHandSpecialist { get; set; } = new();
+        public Roles.SerpentsHand SerpentsHand { get; set; } = new();
         public Configs.SpawnManager SpawnManager { get; set; } = new();
     }
 }
