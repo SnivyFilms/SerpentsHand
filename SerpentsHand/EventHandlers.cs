@@ -69,9 +69,16 @@ namespace SerpentsHand
 		public void OnAnnouncingChaosEntrance(AnnouncingChaosEntranceEventArgs ev)
 		{
 			if (Plugin.Instance.IsSpawnable)
+			{
+				Cassie.Clear();
 				ev.IsAllowed = false;
+			}
+
 			if (Plugin.Instance.Config.BlockChaosCassie)
+			{
+				Cassie.Clear();
 				ev.IsAllowed = false;
+			}
 		}
 		public void OnRespawningTeam(RespawningTeamEventArgs ev)
 		{
