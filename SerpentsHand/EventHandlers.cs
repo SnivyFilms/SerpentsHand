@@ -72,6 +72,7 @@ namespace SerpentsHand
 			{
 				Cassie.Clear();
 				ev.IsAllowed = false;
+				return;
 			}
 
 			if (Plugin.Instance.Config.BlockChaosCassie)
