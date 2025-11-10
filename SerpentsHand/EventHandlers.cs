@@ -88,6 +88,8 @@ namespace SerpentsHand
 				bool scpAlive = Player.List.Count(x => x.Role.Team == Team.SCPs) != 0;
 				if (!scpAlive && !Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps)
 					return;
+				if (ev.Wave.IsMiniWave && !Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave)
+					return;
 				
 				List<Player> players = ev.Players.GetRange(0, ev.Players.Count > Plugin.Instance.Config.SpawnManager.MaxSquad 
 					? Plugin.Instance.Config.SpawnManager.MaxSquad 
@@ -135,9 +137,7 @@ namespace SerpentsHand
 		{
 			if (_plugin.Config.SerpentsHand.TrackedPlayers.Count + _plugin.Config.SerpentsHandSpecialist.TrackedPlayers.Count + _plugin.Config.SerpentsHandLeader.TrackedPlayers.Count <= 0) return;
 			
-			if (ev.ClassList.mtf_and_guards != 0 || ev.ClassList.scientists != 0) 
-				ev.IsAllowed = false;
-			else if (ev.ClassList.class_ds != 0) 
+			if (ev.ClassList.mtf_and_guards != 0 || ev.ClassList.scientists != 0 || ev.ClassList.class_ds != 0) 
 				ev.IsAllowed = false;
 			else if (!_plugin.Config.SpawnManager.ScpsWinWithChaos && ev.ClassList.chaos_insurgents != 0)
 			{
