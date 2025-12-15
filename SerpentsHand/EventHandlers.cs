@@ -70,14 +70,14 @@ namespace SerpentsHand
 		{
 			if (Plugin.Instance.IsSpawnable)
 			{
-				Cassie.Clear();
+				Exiled.API.Features.Cassie.Clear();
 				ev.IsAllowed = false;
 				return;
 			}
 
 			if (Plugin.Instance.Config.BlockChaosCassie)
 			{
-				Cassie.Clear();
+				Exiled.API.Features.Cassie.Clear();
 				ev.IsAllowed = false;
 			}
 		}
@@ -117,7 +117,7 @@ namespace SerpentsHand
                 }
 				SHRespawns++;
 				if (!string.IsNullOrEmpty(Plugin.Instance.Config.SpawnManager.EntryAnnoucement))
-					Cassie.MessageTranslated(Plugin.Instance.Config.SpawnManager.EntryAnnoucement, Plugin.Instance.Config.SpawnManager.CassieText, isSubtitles: Plugin.Instance.Config.SpawnManager.Subtitles);
+					Exiled.API.Features.Cassie.MessageTranslated(Plugin.Instance.Config.SpawnManager.EntryAnnoucement, Plugin.Instance.Config.SpawnManager.CassieText, isSubtitles: Plugin.Instance.Config.SpawnManager.Subtitles);
 
 				if (Plugin.Instance.Config.SpawnManager.EntryBroadcast.Duration > 0 || !string.IsNullOrEmpty(Plugin.Instance.Config.SpawnManager.EntryBroadcast.Content))
 					foreach (Player player in Player.List.Where(x => x.Role.Team == Team.SCPs))
