@@ -26,9 +26,6 @@ namespace SerpentsHand.Configs
         [Description("The message annouced by CASSIE when Serpents hand spawn. (Empty = Disabled)")]
         public string EntryAnnoucement { get; set; } = "SERPENTS HAND HASENTERED";
 
-        [Description("Should the Cassie Message use subtitles")]
-        public bool Subtitles { get; set; } = true;
-
         [Description("The CASSIE text that is shown to the player, Subtitles must be set to true")]
         public string CassieText { get; set; } = "Serpents Hand has entered the facility";
 
