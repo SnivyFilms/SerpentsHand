@@ -10,7 +10,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
 using Exiled.Events.EventArgs.Map;
+using LabApi.Features.Wrappers;
 using Respawning.Waves;
+using Player = Exiled.API.Features.Player;
+using Round = Exiled.API.Features.Round;
 
 namespace SerpentsHand
 {
@@ -44,22 +47,18 @@ namespace SerpentsHand
 				if (Round.IsEnded)
 					break;
 
-				//if (Math.Round(Respawn.TimeUntilSpawnWave.TotalSeconds, 0) != Plugin.Instance.Config.SpawnWaveCalculation)
-				//	continue;
-
-				if (Respawn.IsSpawning)
+				if (RespawnWaves.PrimaryChaosWave != null && Math.Round(RespawnWaves.PrimaryChaosWave.Base.Timer.TimeLeft, 0) != Plugin.Instance.Config.SpawnWaveCalculation 
+				    || Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave && RespawnWaves.MiniChaosWave != null && Math.Round(RespawnWaves.MiniChaosWave.Base.Timer.TimeLeft, 0) != Plugin.Instance.Config.SpawnWaveCalculation)
 					continue;
 
-				if (Respawn.NextKnownSpawnableFaction == SpawnableFaction.ChaosMiniWave &&
-				    Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave)
+				if (Respawn.IsSpawning)
+				//if (RespawnWaves.PrimaryChaosWave != null && RespawnWaves.PrimaryChaosWave.Base.IsReadyToSpawn || Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave && RespawnWaves.MiniChaosWave != null && RespawnWaves.MiniChaosWave.)
+					continue;
+				
+				if ((Respawn.NextKnownSpawnableFaction == SpawnableFaction.ChaosMiniWave &&
+				    Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave) || Respawn.NextKnownSpawnableFaction == SpawnableFaction.ChaosWave)
 				{
-					Plugin.Instance.IsSpawnable = Loader.Random.Next(100) <= Plugin.Instance.Config.SpawnManager.SpawnChance &&
-						Respawns >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
-						SHRespawns < Plugin.Instance.Config.SpawnManager.MaxSpawns || Plugin.Instance.IsForced;
-				}
-				else if (Respawn.NextKnownSpawnableFaction == SpawnableFaction.ChaosWave)
-				{
-					Plugin.Instance.IsSpawnable = Loader.Random.Next(100) <= Plugin.Instance.Config.SpawnManager.SpawnChance &&
+					Plugin.Instance.IsSpawnable = Loader.Random.Next(101) <= Plugin.Instance.Config.SpawnManager.SpawnChance &&
 						Respawns >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
 						SHRespawns < Plugin.Instance.Config.SpawnManager.MaxSpawns || Plugin.Instance.IsForced;
 				}
@@ -70,14 +69,14 @@ namespace SerpentsHand
 		{
 			if (Plugin.Instance.IsSpawnable)
 			{
-				LabApi.Features.Wrappers.Cassie.Clear();
+				LabApi.Features.Wrappers.Announcer.Clear();
 				ev.IsAllowed = false;
 				return;
 			}
 
 			if (Plugin.Instance.Config.BlockChaosCassie)
 			{
-				LabApi.Features.Wrappers.Cassie.Clear();
+				LabApi.Features.Wrappers.Announcer.Clear();
 				ev.IsAllowed = false;
 			}
 		}
@@ -117,7 +116,7 @@ namespace SerpentsHand
                 }
 				SHRespawns++;
 				if (!string.IsNullOrEmpty(Plugin.Instance.Config.SpawnManager.EntryAnnoucement))
-					LabApi.Features.Wrappers.Cassie.Message(Plugin.Instance.Config.SpawnManager.EntryAnnoucement, Plugin.Instance.Config.SpawnManager.CassieText);
+					LabApi.Features.Wrappers.Announcer.Message(Plugin.Instance.Config.SpawnManager.EntryAnnoucement, Plugin.Instance.Config.SpawnManager.CassieText);
 
 				if (Plugin.Instance.Config.SpawnManager.EntryBroadcast.Duration > 0 || !string.IsNullOrEmpty(Plugin.Instance.Config.SpawnManager.EntryBroadcast.Content))
 					foreach (Player player in Player.List.Where(x => x.Role.Team == Team.SCPs))
