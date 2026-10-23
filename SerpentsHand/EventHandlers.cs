@@ -33,15 +33,17 @@ namespace SerpentsHand
 			Respawns = 0;
 			SHRespawns = 0;
 
-			Timing.KillCoroutines(calcuationCoroutine);
+			//Timing.KillCoroutines(calcuationCoroutine);
 
-			calcuationCoroutine = Timing.RunCoroutine(SpawnCalculation());
+			//calcuationCoroutine = Timing.RunCoroutine(SpawnCalculation());
 		}
 
-		private IEnumerator<float> SpawnCalculation()
+		/*private IEnumerator<float> SpawnCalculation()
 		{
 			while (true)
 			{
+				Log.Warn("Calculating spawn...");
+				Log.Warn($"Respawns: {Respawns}, SHRespawns: {SHRespawns}, NextKnownSpawnableFaction: {Respawn.NextKnownSpawnableFaction}, IsSpawning: {Respawn.IsSpawning}");
 				yield return Timing.WaitForSeconds(1f);
 
 				if (Round.IsEnded)
@@ -52,44 +54,54 @@ namespace SerpentsHand
 					continue;
 
 				if (Respawn.IsSpawning)
-				//if (RespawnWaves.PrimaryChaosWave != null && RespawnWaves.PrimaryChaosWave.Base.IsReadyToSpawn || Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave && RespawnWaves.MiniChaosWave != null && RespawnWaves.MiniChaosWave.)
+				{
+					Log.Warn("Spawning");
 					continue;
+				}
+				//if (RespawnWaves.PrimaryChaosWave != null && RespawnWaves.PrimaryChaosWave.Base.IsReadyToSpawn || Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave && RespawnWaves.MiniChaosWave != null && RespawnWaves.MiniChaosWave.)
+				
 				
 				if ((Respawn.NextKnownSpawnableFaction == SpawnableFaction.ChaosMiniWave &&
-				    Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave) || Respawn.NextKnownSpawnableFaction == SpawnableFaction.ChaosWave)
+				    Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave) || Respawn.NextKnownSpawnableFaction == SpawnableFaction.ChaosWave && Respawn.IsSpawning)
 				{
+					Log.Warn("Chaos");
 					Plugin.Instance.IsSpawnable = Loader.Random.Next(101) <= Plugin.Instance.Config.SpawnManager.SpawnChance &&
 						Respawns >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
 						SHRespawns < Plugin.Instance.Config.SpawnManager.MaxSpawns || Plugin.Instance.IsForced;
 				}
 					
 			}
-		}
+		}*/
 		public void OnAnnouncingChaosEntrance(AnnouncingChaosEntranceEventArgs ev)
 		{
 			if (Plugin.Instance.IsSpawnable)
 			{
-				LabApi.Features.Wrappers.Announcer.Clear();
 				ev.IsAllowed = false;
+				LabApi.Features.Wrappers.Announcer.Clear();
 				return;
 			}
 
 			if (Plugin.Instance.Config.BlockChaosCassie)
 			{
-				LabApi.Features.Wrappers.Announcer.Clear();
 				ev.IsAllowed = false;
+				LabApi.Features.Wrappers.Announcer.Clear();
 			}
 		}
 		public void OnRespawningTeam(RespawningTeamEventArgs ev)
 		{
-			if (Plugin.Instance.IsSpawnable || Plugin.Instance.IsForced)
+			//if (Plugin.Instance.IsSpawnable || Plugin.Instance.IsForced)
+			if (ev.Wave.Faction == Faction.FoundationEnemy)
 			{
+				if (Plugin.Instance.Config.SpawnManager.RespawnDelay > Respawns || Plugin.Instance.Config.SpawnManager.MaxSpawns <= SHRespawns)
+					return;
+				if (Plugin.Instance.Config.SpawnManager.SpawnChance < Loader.Random.Next(101) || !Plugin.Instance.IsForced)
+					return;
 				bool scpAlive = Player.List.Count(x => x.Role.Team == Team.SCPs) != 0;
 				if (!scpAlive && !Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps)
 					return;
 				if (ev.Wave.IsMiniWave && !Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave)
 					return;
-				
+				Plugin.Instance.IsSpawnable = true;
 				List<Player> players = ev.Players.GetRange(0, ev.Players.Count > Plugin.Instance.Config.SpawnManager.MaxSquad 
 					? Plugin.Instance.Config.SpawnManager.MaxSquad 
 					: ev.Players.Count);
@@ -130,6 +142,12 @@ namespace SerpentsHand
 			//Timing.CallDelayed(1 /*, UpdateCounter*/);
 			
 			Respawns++;
+		}
+		
+		public void OnWaveSpawned(RespawnedTeamEventArgs ev)
+		{
+			if (Plugin.Instance.IsSpawnable)
+				Plugin.Instance.IsSpawnable = false;
 		}
 
 		public void OnEndingRound(EndingRoundEventArgs ev)

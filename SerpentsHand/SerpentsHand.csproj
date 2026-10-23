@@ -11,31 +11,31 @@
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp-firstpass">
 			<HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)\Assembly-CSharp-firstpass.dll</HintPath>
-			<HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\Assembly-CSharp-firstpass.dll</HintPath>
+			<HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\SL_REFERENCES\Assembly-CSharp-firstpass.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="Mirror">
 			<HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)\Mirror.dll</HintPath>
-			<HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\Mirror.dll</HintPath>
+			<HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\SL_REFERENCES\Mirror.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="UnityEngine">
 			<HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)\UnityEngine.dll</HintPath>
-			<HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\UnityEngine.dll</HintPath>
+			<HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\SL_REFERENCES\UnityEngine.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="UnityEngine.CoreModule">
 			<HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)\UnityEngine.CoreModule.dll</HintPath>
-			<HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\UnityEngine.CoreModule.dll</HintPath>
+			<HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\SL_REFERENCES\UnityEngine.CoreModule.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="UnityEngine.PhysicsModule">
 			<HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)/UnityEngine.PhysicsModule.dll</HintPath>
-			<HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\UnityEngine.PhysicsModule.dll</HintPath>
+			<HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\SL_REFERENCES\UnityEngine.PhysicsModule.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="ExMod.Exiled" Version="9.13.3" />
+	  <PackageReference Include="ExMod.Exiled" Version="9.15.2" />
 	</ItemGroup>
 </Project>
