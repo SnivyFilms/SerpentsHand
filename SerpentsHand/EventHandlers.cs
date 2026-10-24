@@ -92,15 +92,29 @@ namespace SerpentsHand
 			//if (Plugin.Instance.IsSpawnable || Plugin.Instance.IsForced)
 			if (ev.Wave.Faction == Faction.FoundationEnemy)
 			{
-				if (Plugin.Instance.Config.SpawnManager.RespawnDelay > Respawns || Plugin.Instance.Config.SpawnManager.MaxSpawns <= SHRespawns)
+				Log.Warn($"Debug (just cus its easy): Forced: {Plugin.Instance.IsForced}, Respawns: {Respawns}, SHRespawns: {SHRespawns}, SpawnChance: {Plugin.Instance.Config.SpawnManager.SpawnChance}, RespawnDelay: {Plugin.Instance.Config.SpawnManager.RespawnDelay}, MaxSpawns: {Plugin.Instance.Config.SpawnManager.MaxSpawns}");
+				if (!Plugin.Instance.IsForced
+				    || Plugin.Instance.Config.SpawnManager.RespawnDelay > Respawns
+				        && Plugin.Instance.Config.SpawnManager.MaxSpawns <= SHRespawns
+				    && Plugin.Instance.Config.SpawnManager.SpawnChance < Loader.Random.Next(101))
+					return;
+				/*if (Plugin.Instance.Config.SpawnManager.RespawnDelay > Respawns || Plugin.Instance.Config.SpawnManager.MaxSpawns <= SHRespawns)
 					return;
 				if (Plugin.Instance.Config.SpawnManager.SpawnChance < Loader.Random.Next(101) || !Plugin.Instance.IsForced)
-					return;
+					return;*/
 				bool scpAlive = Player.List.Count(x => x.Role.Team == Team.SCPs) != 0;
 				if (!scpAlive && !Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps)
+				{
+					Log.Warn("Not spawning Serpents because there are no SCPs alive and CanSpawnWithoutScps is false");
 					return;
-				if (ev.Wave.IsMiniWave && !Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave)
+				}
+
+				if (!Plugin.Instance.IsForced || ev.Wave.IsMiniWave && !Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave)
+				{
+					Log.Warn("Not spawning Serpents because IsForced is false or it's a mini wave and ShSpawnsDuringMiniWave is false");
 					return;
+				}
+				Log.Warn("Actually Spawning Serpents");
 				Plugin.Instance.IsSpawnable = true;
 				List<Player> players = ev.Players.GetRange(0, ev.Players.Count > Plugin.Instance.Config.SpawnManager.MaxSquad 
 					? Plugin.Instance.Config.SpawnManager.MaxSquad 
