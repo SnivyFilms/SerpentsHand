@@ -45,61 +45,66 @@ namespace SerpentsHand
 
 		public void OnRespawningTeam(RespawningTeamEventArgs ev)
 		{
-			if (ev.Wave.Faction != Faction.FoundationEnemy)
-				return;
-
-			bool forced = Plugin.Instance.IsForced;
-			bool hasScpAlive = Player.List.Any(x => x.Role.Team == Team.SCPs);
-			bool miniWaveBlocked = ev.Wave.IsMiniWave && !Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave;
-			bool conditionsMet = !forced && 
-			                     Respawns >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
-			                     SHRespawns < Plugin.Instance.Config.SpawnManager.MaxSpawns &&
-			                     Loader.Random.Next(101) < Plugin.Instance.Config.SpawnManager.SpawnChance &&
-			                     (hasScpAlive || Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps) &&
-			                     miniWaveBlocked;
-
-			if (!forced && !conditionsMet)
-				return;
-
-			Respawns++;
-
-			Log.Debug("Actually Spawning Serpents");
-			Plugin.Instance.IsSpawnable = true;
-			List<Player> players = ev.Players.GetRange(0, ev.Players.Count > Plugin.Instance.Config.SpawnManager.MaxSquad
-				? Plugin.Instance.Config.SpawnManager.MaxSquad
-				: ev.Players.Count);
-			int SerpentsSpawnCount = 0;
-			foreach (Player player in players)
+			if (ev.Wave.Faction == Faction.FoundationEnemy)
 			{
-				if (player is null)
-					continue;
 
-				if (SerpentsSpawnCount == 0)
+				bool forced = Plugin.Instance.IsForced;
+				bool hasScpAlive = Player.List.Any(x => x.Role.Team == Team.SCPs);
+				bool miniWaveBlocked =
+					ev.Wave.IsMiniWave && !Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave;
+				bool conditionsMet = !forced &&
+				                     Respawns >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
+				                     SHRespawns < Plugin.Instance.Config.SpawnManager.MaxSpawns &&
+				                     Loader.Random.Next(101) < Plugin.Instance.Config.SpawnManager.SpawnChance &&
+				                     (hasScpAlive || Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps) &&
+				                     miniWaveBlocked;
+
+				if (!forced && !conditionsMet)
+					return;
+
+				Log.Debug("Actually Spawning Serpents");
+				Plugin.Instance.IsSpawnable = true;
+				List<Player> players = ev.Players.GetRange(0,
+					ev.Players.Count > Plugin.Instance.Config.SpawnManager.MaxSquad
+						? Plugin.Instance.Config.SpawnManager.MaxSquad
+						: ev.Players.Count);
+				int SerpentsSpawnCount = 0;
+				foreach (Player player in players)
 				{
-					Plugin.Instance.Config.SerpentsHandLeader.AddRole(player);
-					SerpentsSpawnCount++;
+					if (player is null)
+						continue;
+
+					if (SerpentsSpawnCount == 0)
+					{
+						Plugin.Instance.Config.SerpentsHandLeader.AddRole(player);
+						SerpentsSpawnCount++;
+					}
+					else if (SerpentsSpawnCount >= 1 && SerpentsSpawnCount <= 3)
+					{
+						Plugin.Instance.Config.SerpentsHandSpecialist.AddRole(player);
+						SerpentsSpawnCount++;
+					}
+					else
+					{
+						Plugin.Instance.Config.SerpentsHand.AddRole(player);
+					}
 				}
-				else if (SerpentsSpawnCount >= 1 && SerpentsSpawnCount <= 3)
-				{
-					Plugin.Instance.Config.SerpentsHandSpecialist.AddRole(player);
-					SerpentsSpawnCount++;
-				}
-				else
-				{
-					Plugin.Instance.Config.SerpentsHand.AddRole(player);
-				}
+
+				SHRespawns++;
+				if (!string.IsNullOrEmpty(Plugin.Instance.Config.SpawnManager.EntryAnnoucement))
+					LabApi.Features.Wrappers.Announcer.Message(Plugin.Instance.Config.SpawnManager.EntryAnnoucement,
+						Plugin.Instance.Config.SpawnManager.CassieText);
+
+				if (Plugin.Instance.Config.SpawnManager.EntryBroadcast.Duration > 0 ||
+				    !string.IsNullOrEmpty(Plugin.Instance.Config.SpawnManager.EntryBroadcast.Content))
+					foreach (Player player in Player.List.Where(x => x.Role.Team == Team.SCPs))
+						player.Broadcast(Plugin.Instance.Config.SpawnManager.EntryBroadcast);
+
+				Plugin.Instance.IsSpawnable = false;
+				Plugin.Instance.IsForced = false;
+				ev.IsAllowed = false;
 			}
-			SHRespawns++;
-			if (!string.IsNullOrEmpty(Plugin.Instance.Config.SpawnManager.EntryAnnoucement))
-				LabApi.Features.Wrappers.Announcer.Message(Plugin.Instance.Config.SpawnManager.EntryAnnoucement, Plugin.Instance.Config.SpawnManager.CassieText);
-
-			if (Plugin.Instance.Config.SpawnManager.EntryBroadcast.Duration > 0 || !string.IsNullOrEmpty(Plugin.Instance.Config.SpawnManager.EntryBroadcast.Content))
-				foreach (Player player in Player.List.Where(x => x.Role.Team == Team.SCPs))
-					player.Broadcast(Plugin.Instance.Config.SpawnManager.EntryBroadcast);
-
-			Plugin.Instance.IsSpawnable = false;
-			Plugin.Instance.IsForced = false;
-			ev.IsAllowed = false;
+			Respawns++;
 		}
 
 		public void OnEndingRound(EndingRoundEventArgs ev)
