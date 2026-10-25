@@ -1,19 +1,12 @@
 ﻿using Exiled.API.Features;
-using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Server;
 using Exiled.Loader;
 using MEC;
 using PlayerRoles;
-using Respawning;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Exiled.API.Enums;
 using Exiled.Events.EventArgs.Map;
-using LabApi.Features.Wrappers;
-using Respawning.Waves;
 using Player = Exiled.API.Features.Player;
-using Round = Exiled.API.Features.Round;
 
 namespace SerpentsHand
 {
@@ -32,46 +25,8 @@ namespace SerpentsHand
 			Plugin.Instance.IsForced = false;
 			Respawns = 0;
 			SHRespawns = 0;
-
-			//Timing.KillCoroutines(calcuationCoroutine);
-
-			//calcuationCoroutine = Timing.RunCoroutine(SpawnCalculation());
 		}
-
-		/*private IEnumerator<float> SpawnCalculation()
-		{
-			while (true)
-			{
-				Log.Warn("Calculating spawn...");
-				Log.Warn($"Respawns: {Respawns}, SHRespawns: {SHRespawns}, NextKnownSpawnableFaction: {Respawn.NextKnownSpawnableFaction}, IsSpawning: {Respawn.IsSpawning}");
-				yield return Timing.WaitForSeconds(1f);
-
-				if (Round.IsEnded)
-					break;
-
-				if (RespawnWaves.PrimaryChaosWave != null && Math.Round(RespawnWaves.PrimaryChaosWave.Base.Timer.TimeLeft, 0) != Plugin.Instance.Config.SpawnWaveCalculation 
-				    || Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave && RespawnWaves.MiniChaosWave != null && Math.Round(RespawnWaves.MiniChaosWave.Base.Timer.TimeLeft, 0) != Plugin.Instance.Config.SpawnWaveCalculation)
-					continue;
-
-				if (Respawn.IsSpawning)
-				{
-					Log.Warn("Spawning");
-					continue;
-				}
-				//if (RespawnWaves.PrimaryChaosWave != null && RespawnWaves.PrimaryChaosWave.Base.IsReadyToSpawn || Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave && RespawnWaves.MiniChaosWave != null && RespawnWaves.MiniChaosWave.)
-				
-				
-				if ((Respawn.NextKnownSpawnableFaction == SpawnableFaction.ChaosMiniWave &&
-				    Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave) || Respawn.NextKnownSpawnableFaction == SpawnableFaction.ChaosWave && Respawn.IsSpawning)
-				{
-					Log.Warn("Chaos");
-					Plugin.Instance.IsSpawnable = Loader.Random.Next(101) <= Plugin.Instance.Config.SpawnManager.SpawnChance &&
-						Respawns >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
-						SHRespawns < Plugin.Instance.Config.SpawnManager.MaxSpawns || Plugin.Instance.IsForced;
-				}
-					
-			}
-		}*/
+		
 		public void OnAnnouncingChaosEntrance(AnnouncingChaosEntranceEventArgs ev)
 		{
 			if (Plugin.Instance.IsSpawnable)
@@ -177,23 +132,17 @@ namespace SerpentsHand
 
 		public void OnEndingRound(EndingRoundEventArgs ev)
 		{
-			if (_plugin.Config.SerpentsHand.TrackedPlayers.Count + _plugin.Config.SerpentsHandSpecialist.TrackedPlayers.Count + _plugin.Config.SerpentsHandLeader.TrackedPlayers.Count <= 0) return;
-			
-			if (ev.ClassList.mtf_and_guards != 0 || ev.ClassList.scientists != 0 || ev.ClassList.class_ds != 0) 
+			if (_plugin.Config.SerpentsHand.TrackedPlayers.Count +
+			    _plugin.Config.SerpentsHandSpecialist.TrackedPlayers.Count +
+			    _plugin.Config.SerpentsHandLeader.TrackedPlayers.Count <= 0) return;
+
+			if (ev.ClassList.mtf_and_guards != 0 || ev.ClassList.scientists != 0 || ev.ClassList.class_ds != 0)
 				ev.IsAllowed = false;
 			else if (!_plugin.Config.SpawnManager.ScpsWinWithChaos && ev.ClassList.chaos_insurgents != 0)
 			{
-				ev.IsAllowed = ev.ClassList is { mtf_and_guards: 0, scientists: 0, scps_except_zombies: 0, zombies: 0, class_ds: 0};
+				ev.IsAllowed = ev.ClassList is
+					{ mtf_and_guards: 0, scientists: 0, scps_except_zombies: 0, zombies: 0, class_ds: 0 };
 			}
 		}
-
-		/*public void OnSpawned(SpawnedEventArgs ev)
-		{
-			if(ev.Player.IsCHI && ev.Reason != SpawnReason.Respawn)
-				UpdateCounter();
-		}
-
-		private void UpdateCounter() =>
-			RoundSummary.singleton.ExtraTargets = Plugin.Instance.Config.SpawnManager.ScpsWinWithChaos ? 0 : Player.List.Count(p => p.IsCHI);*/
 	}
 }
