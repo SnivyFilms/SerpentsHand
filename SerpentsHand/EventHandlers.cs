@@ -51,12 +51,12 @@ namespace SerpentsHand
 			bool forced = Plugin.Instance.IsForced;
 			bool hasScpAlive = Player.List.Any(x => x.Role.Team == Team.SCPs);
 			bool miniWaveBlocked = ev.Wave.IsMiniWave && !Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave;
-			bool conditionsMet = !forced &&
-				Respawns >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
-				SHRespawns < Plugin.Instance.Config.SpawnManager.MaxSpawns &&
-				Loader.Random.Next(101) < Plugin.Instance.Config.SpawnManager.SpawnChance &&
-				(hasScpAlive || Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps) &&
-				!miniWaveBlocked;
+			bool conditionsMet = !forced && 
+			                     Respawns >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
+			                     SHRespawns < Plugin.Instance.Config.SpawnManager.MaxSpawns &&
+			                     Loader.Random.Next(101) < Plugin.Instance.Config.SpawnManager.SpawnChance &&
+			                     (hasScpAlive || Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps) &&
+			                     miniWaveBlocked;
 
 			if (!forced && !conditionsMet)
 				return;
