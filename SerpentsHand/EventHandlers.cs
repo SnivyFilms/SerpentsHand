@@ -42,53 +42,31 @@ namespace SerpentsHand
 				LabApi.Features.Wrappers.Announcer.Clear();
 			}
 		}
+
 		public void OnRespawningTeam(RespawningTeamEventArgs ev)
 		{
 			if (ev.Wave.Faction != Faction.FoundationEnemy)
-			{
-				Log.Debug("Returning since its not a Chaos Spawn");
 				return;
-			}
 
-			if (Respawns < Plugin.Instance.Config.SpawnManager.RespawnDelay)
-			{
-				Log.Debug($"Respawn delay not reached yet. Respawns: {Respawns}/{Plugin.Instance.Config.SpawnManager.RespawnDelay}");
-				Respawns++;
+			bool forced = Plugin.Instance.IsForced;
+			bool hasScpAlive = Player.List.Any(x => x.Role.Team == Team.SCPs);
+			bool miniWaveBlocked = ev.Wave.IsMiniWave && !Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave;
+			bool conditionsMet = !forced &&
+				Respawns >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
+				SHRespawns < Plugin.Instance.Config.SpawnManager.MaxSpawns &&
+				Loader.Random.Next(101) < Plugin.Instance.Config.SpawnManager.SpawnChance &&
+				(hasScpAlive || Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps) &&
+				!miniWaveBlocked;
+
+			if (!forced && !conditionsMet)
 				return;
-			}
+
 			Respawns++;
 
-			if (Plugin.Instance.Config.SpawnManager.MaxSpawns <= SHRespawns)
-			{
-				Log.Debug("Not spawning Serpents because max spawns have been reached.");
-				return;
-			}
-
-			int randomChance = Loader.Random.Next(101);
-			if (Plugin.Instance.Config.SpawnManager.SpawnChance <= randomChance)
-			{
-				Log.Debug($"Random roll failed. SpawnChance: {Plugin.Instance.Config.SpawnManager.SpawnChance}, Random: {randomChance}");
-				return;
-			}
-
-			bool scpAlive = Player.List.Count(x => x.Role.Team == Team.SCPs) != 0;
-			if (!scpAlive && !Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps)
-			{
-				Log.Debug("Not spawning Serpents because there are no SCPs alive and CanSpawnWithoutScps is false");
-				return;
-			}
-
-			if (ev.Wave.IsMiniWave && !Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave)
-			{
-				Log.Debug("Not spawning Serpents because it's a mini wave and ShSpawnsDuringMiniWave is false");
-				return;
-			}
-
-			Log.Debug($"Random Chance: {randomChance}, SpawnChance: {Plugin.Instance.Config.SpawnManager.SpawnChance}");
 			Log.Debug("Actually Spawning Serpents");
 			Plugin.Instance.IsSpawnable = true;
-			List<Player> players = ev.Players.GetRange(0, ev.Players.Count > Plugin.Instance.Config.SpawnManager.MaxSquad 
-				? Plugin.Instance.Config.SpawnManager.MaxSquad 
+			List<Player> players = ev.Players.GetRange(0, ev.Players.Count > Plugin.Instance.Config.SpawnManager.MaxSquad
+				? Plugin.Instance.Config.SpawnManager.MaxSquad
 				: ev.Players.Count);
 			int SerpentsSpawnCount = 0;
 			foreach (Player player in players)
@@ -122,12 +100,6 @@ namespace SerpentsHand
 			Plugin.Instance.IsSpawnable = false;
 			Plugin.Instance.IsForced = false;
 			ev.IsAllowed = false;
-		}
-		
-		public void OnWaveSpawned(RespawnedTeamEventArgs ev)
-		{
-			if (Plugin.Instance.IsSpawnable)
-				Plugin.Instance.IsSpawnable = false;
 		}
 
 		public void OnEndingRound(EndingRoundEventArgs ev)

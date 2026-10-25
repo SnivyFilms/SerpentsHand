@@ -32,7 +32,6 @@ namespace SerpentsHand
 			eventHandlers = new EventHandlers(this);
 			Server.RoundStarted += eventHandlers.OnRoundStarted;
 			Server.RespawningTeam += eventHandlers.OnRespawningTeam;
-			Server.RespawnedTeam += eventHandlers.OnWaveSpawned;
 			Server.EndingRound += eventHandlers.OnEndingRound;
 			Map.AnnouncingChaosEntrance += eventHandlers.OnAnnouncingChaosEntrance;
 			//Player.Spawned += eventHandlers.OnSpawned;
@@ -45,7 +44,6 @@ namespace SerpentsHand
 			CustomRole.UnregisterRoles();
 			Server.RoundStarted -= eventHandlers.OnRoundStarted;
 			Server.RespawningTeam -= eventHandlers.OnRespawningTeam;
-			Server.RespawnedTeam -= eventHandlers.OnWaveSpawned;
 			Server.EndingRound -= eventHandlers.OnEndingRound;
 			Map.AnnouncingChaosEntrance -= eventHandlers.OnAnnouncingChaosEntrance;
 			//Player.Spawned -= eventHandlers.OnSpawned;
