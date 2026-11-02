@@ -45,19 +45,21 @@ namespace SerpentsHand
 
 		public void OnRespawningTeam(RespawningTeamEventArgs ev)
 		{
+			Respawns++;
+			
 			if (ev.Wave.Faction == Faction.FoundationEnemy)
 			{
 
 				bool forced = Plugin.Instance.IsForced;
 				bool hasScpAlive = Player.List.Any(x => x.Role.Team == Team.SCPs);
-				bool miniWaveBlocked =
-					ev.Wave.IsMiniWave && !Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave;
+				bool miniWave =
+					!ev.Wave.IsMiniWave || (ev.Wave.IsMiniWave && Plugin.Instance.Config.SpawnManager.ShSpawnsDuringMiniWave);
 				bool conditionsMet = !forced &&
-				                     Respawns >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
+				                     Respawns - 1 >= Plugin.Instance.Config.SpawnManager.RespawnDelay &&
 				                     SHRespawns < Plugin.Instance.Config.SpawnManager.MaxSpawns &&
 				                     Loader.Random.Next(101) < Plugin.Instance.Config.SpawnManager.SpawnChance &&
 				                     (hasScpAlive || Plugin.Instance.Config.SpawnManager.CanSpawnWithoutScps) &&
-				                     miniWaveBlocked;
+				                     miniWave;
 
 				if (!forced && !conditionsMet)
 					return;
@@ -104,7 +106,6 @@ namespace SerpentsHand
 				Plugin.Instance.IsForced = false;
 				ev.IsAllowed = false;
 			}
-			Respawns++;
 		}
 
 		public void OnEndingRound(EndingRoundEventArgs ev)
